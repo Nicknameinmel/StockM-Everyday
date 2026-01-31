@@ -1,0 +1,40 @@
+name: 每日股息预测
+
+on:
+  # 1. 每天北京时间早上 9:00 运行 (UTC 1:00)
+  schedule:
+    - cron: '0 1 * * *'
+  # 2. 允许手动点击按钮触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 第一步：拉取代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 第二步：安装 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 第三步：安装依赖库
+      - name: Install dependencies
+        run: |
+          pip install pandas yfinance lxml
+
+      # 第四步：运行你的脚本
+      - name: Run Dividend Analysis
+        run: python run_analysis.py
+
+      # 第五步：上传 CSV 结果到 GitHub Artifacts (让你能下载)
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dividend-report
+          path: dividend_report.csv
+          retention-days: 7
